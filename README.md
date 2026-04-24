@@ -87,3 +87,4 @@ Demon.onHpChanged         → GameMain: HP 게이지 갱신 / HP 0 시 게이지
 
 - Unity 6 (URP)
 - C#
+
