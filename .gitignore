@@ -1,3 +1,5 @@
+*.csproj
+*.sln
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
