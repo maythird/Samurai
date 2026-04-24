@@ -1,53 +1,86 @@
 using UnityEngine;
-using System.Collections;
 
 public class Samurai : MonoBehaviour
 {
-   //애니메이터 paramaters
-   // int 형식 state
-   // 0 : Idle
-   // 1 : Attack
-   // 2 : Run
+    public enum States
+    {
+        Idle,
+        Attack,
+        Run
+    }
 
-   public delegate void OnAttackStarted();
-   public event OnAttackStarted onAttackStarted;
+    public delegate void OnStateChanged(States state);
+    public event OnStateChanged onStateChanged;
 
-   public Transform fxSlashPoint;
+    public delegate void OnAttackHit(float remainingTime);
+    public event OnAttackHit onAttackHit;
 
-   private Animator animator;
-   public float moveSpeed = 3f;
+    public float runSpeed = 3f;
+    [Range(0f, 1f)] public float attackFxTiming = 0.5f;
 
-   private void Awake()
-   {
-      animator = GetComponent<Animator>();
-   }
+    States state = States.Idle;
+    Animator animator;
+    bool fxFired = false;
 
-   public IEnumerator Move(Vector3 tPos)
-   {
-      animator.SetInteger("State", 2);
+    void Start()
+    {
+        animator = GetComponent<Animator>();
+        PlayRun();
+    }
 
-      while (Vector3.Distance(transform.position, tPos) > 0.05f)
-      {
-         transform.position = Vector3.MoveTowards(transform.position, tPos, moveSpeed * Time.deltaTime);
-         yield return null;
-      }
+    void Update()
+    {
+        if (state == States.Attack)
+        {
+            AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
 
-      transform.position = tPos;
-      animator.SetInteger("State", 0);
-   }
+            if (!fxFired && info.IsName("Samurai_Attack") && info.normalizedTime >= attackFxTiming)
+            {
+                fxFired = true;
+                float remainingTime = info.length * (1f - info.normalizedTime);
+                onAttackHit?.Invoke(remainingTime);
+            }
 
-   public IEnumerator Attack()
-   {
-      animator.SetInteger("State", 1);
-      onAttackStarted?.Invoke();
+            if (info.IsName("Samurai_Attack") && info.normalizedTime >= 1f)
+            {
+                fxFired = false;
+                PlayIdle();
+            }
+        }
 
-      if (fxSlashPoint != null)
-         FxManager.Instance?.PlaySlash(fxSlashPoint.position);
+        if (state == States.Run)
+        {
+            Vector3 target = new Vector3(0f, -3.5f, 0f);
+            transform.position = Vector3.MoveTowards(transform.position, target, runSpeed * Time.deltaTime);
 
-      yield return null; // 애니메이터가 Attack 상태로 전환될 때까지 한 프레임 대기
-      float clipLength = animator.GetCurrentAnimatorStateInfo(0).length;
-      yield return new WaitForSeconds(clipLength);
+            if (transform.position == target)
+            {
+                PlayIdle();
+            }
+        }
+    }
 
-      animator.SetInteger("State", 0);
-   }
+    public bool PlayAttack()
+    {
+        if (state == States.Attack) return false;
+
+        state = States.Attack;
+        animator.SetInteger("State", (int)States.Attack);
+        onStateChanged?.Invoke(state);
+        return true;
+    }
+
+    public void PlayIdle()
+    {
+        state = States.Idle;
+        animator.SetInteger("State", (int)States.Idle);
+        onStateChanged?.Invoke(state);
+    }
+
+    public void PlayRun()
+    {
+        state = States.Run;
+        animator.SetInteger("State", (int)States.Run);
+        onStateChanged?.Invoke(state);
+    }
 }

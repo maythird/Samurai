@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 9184592426980623854}
   - component: {fileID: 7519354755578699559}
   - component: {fileID: 6052874485040274717}
-  - component: {fileID: 6434983831772099697}
+  - component: {fileID: 1984060946248265778}
   m_Layer: 0
   m_Name: Samurai
   m_TagString: Untagged
@@ -147,7 +147,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &6434983831772099697
+--- !u!114 &1984060946248265778
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -159,6 +159,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50e4f2a659dd76643879f84eb6702c22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Samurai
-  fxSlashPoint: {fileID: 7667738818007874836}
-  fxSlashPrefab: {fileID: 952939330746859076, guid: 1c73b31cc6f21c94a86b7d5cdcd281a7, type: 3}
-  moveSpeed: 3
